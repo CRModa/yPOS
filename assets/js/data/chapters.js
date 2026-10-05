@@ -8,7 +8,7 @@
   Y.cover = {
     kit: [
       {icon: 'cellphone', title: 'Um telemóvel', text: 'Android ou iPhone, com o YPOS instalado. Não precisa de internet para vender.'},
-      {icon: 'key-outline', title: 'Uma licença', text: 'Um código dado pelo seu fornecedor, válido só para o seu telemóvel.'},
+      {icon: 'key-outline', title: 'Uma licença', text: 'Um código do seu fornecedor, só para o seu telemóvel, no plano Basic, Plus ou Premium.'},
       {icon: 'printer-outline', title: 'Impressora', tag: 'opcional', text: 'Térmica Bluetooth de 58 mm, para imprimir os talões.'},
     ],
     day: [
@@ -29,7 +29,7 @@
       group: 'Introdução',
       icon: 'rocket-launch-outline',
       title: 'Primeiros passos',
-      lead: 'Na primeira vez: <b>ativar a licença</b> e <b>configurar a empresa</b>. Depois disso, basta entrar com o seu e-mail e senha.',
+      lead: 'Na primeira vez: <b>ativar a licença</b> e <b>configurar a empresa</b> (ou restaurar um backup). Depois disso, basta entrar com o seu e-mail e senha.',
       tasks: [
         {
           id: 'ativar',
@@ -58,7 +58,10 @@
             'Crie a conta do <b>Administrador da empresa</b>: nome, e-mail e uma senha com pelo menos 4 caracteres, repetida em <b>Confirmar senha</b>.',
             'Toque em <b>Concluir</b>. O YPOS entra na sua conta e abre o ecrã de vendas.',
           ],
-          after: [{note: 'tip', text: 'Guarde bem este e-mail e esta senha. É a conta com mais poderes e a única que pode criar contas para os funcionários.'}],
+          after: [
+            {note: 'tip', text: 'Guarde bem este e-mail e esta senha. É a <b>conta principal</b>: a que tem mais poderes e a única que entra no plano Basic.'},
+            {note: 'info', text: 'Já usava o YPOS noutro telemóvel? Em vez de preencher, toque em <b>Restaurar a partir de um backup</b> (<a href="#backup/restaurar">capítulo 11</a>).'},
+          ],
         },
         {
           id: 'entrar',
@@ -80,13 +83,13 @@
       group: 'Introdução',
       icon: 'cellphone-screenshot',
       title: 'Conhecer o ecrã',
-      lead: 'Muda de área com a <b>barra de baixo</b>. Os ícones do <b>canto superior direito</b> dão acesso às definições e ao seu menu.',
+      lead: 'Muda de área com a <b>barra de baixo</b>. Os ícones do <b>canto superior direito</b> dão acesso às definições e ao seu menu. Só aparece o que o seu perfil e o seu plano permitem.',
       tasks: [
         {
           id: 'barra',
           icon: 'dock-bottom',
           title: 'A barra de baixo',
-          summary: 'As 5 áreas do YPOS',
+          summary: 'As áreas do YPOS',
           demo: 'tour',
           after: [
             {
@@ -95,13 +98,13 @@
                 rows: [
                   ['<b>Venda</b> (ao centro)', 'Fazer vendas no ecrã <b>POS</b>'],
                   ['<b>Painel</b>', 'Ver as vendas, os lucros e os relatórios'],
-                  ['<b>Produtos</b>', 'Criar e editar produtos e ver o stock'],
-                  ['<b>Compras</b>', 'Registar a mercadoria comprada aos fornecedores'],
-                  ['<b>Faturas</b>', 'Emitir faturas a clientes e registar os pagamentos'],
+                  ['<b>Produtos</b>', 'Produtos, compostos e serviços, e o stock'],
+                  ['<b>Compras</b>', 'Registar a mercadoria comprada. <i>Só Gestor e Administrador</i>'],
+                  ['<b>Faturas</b>', 'Faturas a clientes e pagamentos. <i>Planos Plus e Premium</i>'],
                 ],
               },
             },
-            {note: 'info', text: 'A área onde está fica destacada no círculo verde, por cima da barra.'},
+            {note: 'info', text: 'Com o perfil <b>Vendedor</b> não aparece <b>Compras</b>; no plano <b>Basic</b> não aparece <b>Faturas</b>. A área onde está fica no círculo verde, por cima da barra.'},
           ],
         },
         {
@@ -115,10 +118,13 @@
               table: {
                 head: ['Ícone', 'Para que serve'],
                 rows: [
-                  ['<b>Empresa</b>', 'Mudar os dados da empresa. Só aparece para o administrador criado na configuração inicial'],
+                  ['<b>Empresa</b>', 'Mudar os dados da empresa. Só aparece para a conta principal'],
                   ['<b>Impressora</b>', 'Ligar a impressora de talões por Bluetooth'],
                   ['<b>Sol / lua</b>', 'Mudar entre o modo claro e o modo escuro'],
-                  ['<b>O seu nome</b>', 'Menu com <b>Clientes</b>, <b>Fornecedores</b>, <b>Utilizadores</b> (só administradores), <b>Licença</b> e <b>Sair</b>'],
+                  [
+                    '<b>O seu nome</b>',
+                    'Menu com <b>Clientes</b>, <b>Fornecedores</b>, <b>Utilizadores</b> (administradores, Plus e Premium), <b>Backup e restauro</b> (administradores), <b>Licença</b> e <b>Sair</b>',
+                  ],
                 ],
               },
             },
@@ -133,23 +139,56 @@
       n: 3,
       group: 'Operações',
       icon: 'package-variant-closed',
-      title: 'Produtos',
-      lead: 'Crie os produtos antes de vender. Depois disso, cada venda, compra e fatura atualiza o stock sozinha.',
+      title: 'Produtos e serviços',
+      lead: 'Crie os produtos antes de vender. Há três tipos: <b>Simples</b>, <b>Composto</b> e <b>Serviço</b>. Depois disso, cada venda, compra e fatura atualiza o stock sozinha.',
       tasks: [
+        {
+          id: 'tipos',
+          icon: 'shape-outline',
+          title: 'Os três tipos',
+          summary: 'Qual escolher',
+          after: [
+            {
+              table: {
+                head: ['Tipo', 'Como funciona o stock', 'Exemplo'],
+                rows: [
+                  ['<b>Simples</b>', 'Tem stock próprio: sobe com as compras e desce com as vendas', 'Arroz 5kg'],
+                  ['<b>Composto</b>', 'Feito de outros produtos. O stock é calculado a partir dos componentes, e vender baixa cada componente', 'Cesta básica'],
+                  ['<b>Serviço</b>', 'Sem stock. Pode gastar materiais, que descem a cada venda. <i>Só no plano Premium</i>', 'Entrega, montagem'],
+                ],
+              },
+            },
+            {
+              table: {
+                caption: 'Etiquetas na lista de produtos',
+                head: ['Etiqueta', 'O que quer dizer'],
+                rows: [
+                  ['<span class="badge warn">Estoque baixo</span>', 'Chegou ao stock mínimo: reponha'],
+                  ['<span class="badge ok">Composto</span>', 'Produto feito de componentes'],
+                  ['<span class="badge ok">Serviço</span>', 'Sem stock próprio'],
+                  ['<span class="badge">Oculto no POS</span>', 'Não aparece para vender (ver abaixo)'],
+                  ['<span class="badge">Inativo</span>', 'Desativado: não aparece para vender'],
+                ],
+              },
+            },
+            {note: 'info', text: 'Com o perfil <b>Vendedor</b>, a aba <b>Produtos</b> é só de consulta: não cria, não edita e não ajusta stock.'},
+          ],
+        },
         {
           id: 'criar',
           icon: 'plus-box-outline',
-          title: 'Criar um produto',
+          title: 'Criar um produto simples',
           summary: 'Nome, categoria, preço e stock',
           demo: 'produto',
           steps: [
             'Toque em <b>Produtos</b> na barra de baixo.',
             'Toque no botão redondo <kbd>+</kbd>, no canto inferior direito.',
+            'Em <b>TIPO</b>, deixe <b>Simples</b>.',
             {
               text: 'Preencha os campos:',
               list: [
                 '<b>NOME DO PRODUTO</b>, por exemplo "Arroz 5kg".',
-                '<b>CATEGORIA</b>: toque numa existente, ou escreva uma em <b>Nova categoria</b> e toque em <b>Adicionar</b>.',
+                '<b>CATEGORIA</b>: escolha uma, ou escreva uma em <b>Nova categoria</b> e toque em <b>Adicionar</b>.',
                 '<b>PREÇO DE VENDA</b>: o que o cliente paga.',
                 '<b>CUSTO DE PRODUÇÃO</b>: quanto lhe custou. Sem ele, o Painel não calcula o lucro.',
                 '<b>ESTOQUE INICIAL</b>: quanto tem agora na loja.',
@@ -161,6 +200,53 @@
           after: [{note: 'info', text: 'Obrigatórios: <b>nome</b>, <b>categoria</b> e <b>preço de venda</b>.'}],
         },
         {
+          id: 'composto',
+          icon: 'package-variant-plus',
+          title: 'Criar um produto composto',
+          summary: 'Cestas, kits, combos',
+          demo: 'composto',
+          intro: 'Um composto junta vários produtos simples num só. Os componentes têm de existir antes.',
+          steps: [
+            'Em <b>Produtos</b>, toque em <kbd>+</kbd> e escreva o nome, por exemplo "Cesta básica".',
+            'Em <b>TIPO</b>, escolha <b>Composto</b>.',
+            'Escolha a <b>CATEGORIA</b> e escreva o <b>PREÇO DE VENDA</b>.',
+            'Em <b>COMPONENTES (POR UNIDADE)</b>, escolha cada componente e a quantidade que leva. Para mais, toque em <b>Adicionar componente</b>.',
+            'Confira o <b>Stock disponível</b> e o <b>Custo</b>, calculados sozinhos, e toque em <b>Salvar</b>.',
+          ],
+          after: [
+            {note: 'tip', text: 'O stock de um composto é quantas unidades os componentes permitem montar. Para o aumentar, compre ou ajuste os <b>componentes</b>.'},
+            {note: 'info', text: 'Só produtos simples podem ser componentes: um composto ou um serviço não pode entrar noutro composto.'},
+          ],
+        },
+        {
+          id: 'servico',
+          icon: 'hand-heart-outline',
+          title: 'Criar um serviço',
+          summary: 'Plano Premium',
+          demo: 'servico',
+          steps: [
+            'Em <b>Produtos</b>, toque em <kbd>+</kbd> e, em <b>TIPO</b>, escolha <b>Serviço</b>.',
+            'Escreva o <b>NOME DO SERVIÇO</b>, a <b>CATEGORIA</b> e o <b>PREÇO DE VENDA</b>.',
+            'Se quiser, indique o <b>CUSTO DO SERVIÇO (MÃO DE OBRA, OPCIONAL)</b>, para o lucro ficar certo.',
+            'Em <b>MATERIAIS CONSUMIDOS (OPCIONAL)</b>, toque em <b>Adicionar material</b> para cada produto que o serviço gasta. Sem materiais, vender o serviço não mexe no stock.',
+            'Toque em <b>Salvar</b>.',
+          ],
+          after: [{note: 'warning', text: 'O tipo <b>Serviço</b> só aparece no plano <b>Premium</b>. Se o plano descer, os serviços ficam guardados mas deixam de aparecer para vender.'}],
+        },
+        {
+          id: 'ocultar',
+          icon: 'eye-off-outline',
+          title: 'Esconder um item do POS',
+          summary: 'Itens só para componentes',
+          intro: 'Útil para coisas que só usa como componente ou material, como caixas ou sacos.',
+          steps: [
+            'Abra a ficha do produto (ou crie-o).',
+            'Desligue <b>Mostrar no painel de vendas</b>.',
+            'Toque em <b>Salvar alterações</b>. Fica com a etiqueta <span class="badge">Oculto no POS</span>.',
+          ],
+          after: [{p: 'O item sai do POS e das faturas novas, mas continua em <b>Produtos</b> e em <b>Compras</b>.'}],
+        },
+        {
           id: 'editar',
           icon: 'pencil-outline',
           title: 'Procurar e editar um produto',
@@ -168,10 +254,9 @@
           steps: [
             'Escreva parte do nome em <b>Buscar produto...</b>.',
             'Toque no produto para abrir a ficha.',
-            'Altere o que precisar, incluindo a <b>UNIDADE DE MEDIDA</b> (UN, KG, L…).',
+            'Altere o que precisar, incluindo a <b>UNIDADE DE MEDIDA</b> (UN, KG, L…) ou os componentes.',
             'Toque em <b>Salvar alterações</b>.',
           ],
-          after: [{p: 'Os produtos com a etiqueta <span class="badge warn">Estoque baixo</span> precisam de ser repostos.'}],
         },
         {
           id: 'ajustar',
@@ -189,7 +274,10 @@
             'Escreva a <b>QUANTIDADE</b> e o <b>MOTIVO</b>, por exemplo "Contagem física".',
             'Confira o <b>Novo estoque após o ajuste</b> e toque em <b>Confirmar ajuste</b>.',
           ],
-          after: [{note: 'warning', text: 'Um ajuste não pode deixar o stock negativo. Mercadoria comprada regista-se em <b>Compras</b>, não aqui.'}],
+          after: [
+            {note: 'warning', text: 'Um ajuste não pode deixar o stock negativo. Mercadoria comprada regista-se em <b>Compras</b>, não aqui.'},
+            {note: 'info', text: 'Não há <b>Ajustar</b> em compostos e serviços (ajuste os componentes ou materiais), nem para o perfil <b>Vendedor</b>.'},
+          ],
         },
       ],
     },
@@ -221,6 +309,9 @@
             {
               list: [
                 'Um ícone amarelo junto ao stock indica que o produto está a acabar.',
+                'Os serviços mostram <b>Serviço</b> em vez do stock.',
+                'Vender um <b>composto</b> baixa o stock de cada componente; vender um <b>serviço</b> baixa os materiais que consome.',
+                'Não aparece um produto? Pode estar <a href="#produtos/ocultar">oculto no POS</a>, inativo, ou ser um serviço fora do plano Premium.',
                 'Para desistir do pagamento, toque em <b>Cancelar</b>: os produtos continuam no carrinho.',
                 'No POS o pagamento fica sempre como <b>Dinheiro</b>. Para M-Pesa, e-Mola, cartão ou transferência, use uma <a href="#faturas/recibo">fatura com recibo</a>.',
               ],
@@ -236,7 +327,7 @@
       group: 'Operações',
       icon: 'truck-delivery-outline',
       title: 'Compras e fornecedores',
-      lead: 'Quando chega mercadoria, registe-a em <b>Compras</b>: o stock sobe, o custo atualiza e o valor conta como despesa no Painel.',
+      lead: 'Quando chega mercadoria, registe-a em <b>Compras</b>: o stock sobe, o custo atualiza e o valor conta como despesa no Painel. Só Gestores e Administradores registam compras.',
       tasks: [
         {
           id: 'registar',
@@ -259,7 +350,10 @@
             'Mais linhas? Toque em <b>Adicionar item</b>. Para tirar uma, <b>Remover</b>.',
             'Confira o <b>Total previsto</b> e toque em <b>Salvar Compra</b>.',
           ],
-          after: [{p: 'A compra fica registada com a data de hoje, como paga.'}],
+          after: [
+            {p: 'A compra fica registada com a data de hoje, como paga.'},
+            {note: 'info', text: 'Compostos e serviços não aparecem nas compras: o stock deles vem dos componentes e materiais, que são o que deve comprar.'},
+          ],
         },
         {
           id: 'fornecedores',
@@ -281,7 +375,7 @@
       group: 'Operações',
       icon: 'file-document-outline',
       title: 'Clientes, faturas e recibos',
-      lead: 'Use faturas quando o cliente paga depois, ou por M-Pesa, e-Mola, cartão ou transferência. Primeiro a <b>fatura</b>; a cada pagamento, um <b>recibo</b>.',
+      lead: 'Use faturas quando o cliente paga depois, ou por M-Pesa, e-Mola, cartão ou transferência. Primeiro a <b>fatura</b>; a cada pagamento, um <b>recibo</b>. Disponível nos planos <b>Plus</b> e <b>Premium</b>.',
       tasks: [
         {
           id: 'cliente',
@@ -307,11 +401,17 @@
             'Se quiser, indique a data-limite em <b>VENCIMENTO (OPCIONAL)</b>.',
             {
               text: 'Em <b>ITENS</b>, junte as linhas:',
-              list: ['<b>Produto</b>: da loja. O stock desce ao guardar.', '<b>Avulso</b>: um serviço, como "Entrega".'],
+              list: [
+                '<b>Produto</b>: da loja, incluindo compostos e (no Premium) serviços. O stock desce ao guardar.',
+                '<b>Avulso</b>: algo que não está nos produtos, como "Entrega".',
+              ],
             },
             'Confira o <b>Total da fatura</b> e toque em <b>Salvar Fatura</b>.',
           ],
-          after: [{note: 'warning', text: 'A mensagem vermelha "Quantidade acima do estoque disponível" não impede de guardar, mas o stock desse produto fica negativo.'}],
+          after: [
+            {note: 'warning', text: 'A mensagem vermelha "Quantidade acima do estoque disponível" não impede de guardar, mas o stock desse produto fica negativo.'},
+            {p: 'Num serviço aparece "Serviço: baixa apenas os materiais que consome".'},
+          ],
         },
         {
           id: 'recibo',
@@ -433,7 +533,10 @@
                 ],
               },
             },
-            {note: 'warning', text: 'O lucro só está certo se os produtos tiverem o <b>CUSTO DE PRODUÇÃO</b> preenchido (<a href="#produtos/criar">capítulo 3</a>).'},
+            {
+              note: 'warning',
+              text: 'O lucro só está certo com os custos preenchidos: <b>CUSTO DE PRODUÇÃO</b> nos simples, componentes nos compostos e <b>CUSTO DO SERVIÇO</b> nos serviços (<a href="#produtos/criar">capítulo 3</a>).',
+            },
           ],
         },
         {
@@ -444,7 +547,7 @@
           steps: [
             'No fim do Painel, vá a <b>Exportar relatórios (Excel)</b>.',
             'Escolha <b>De</b> e <b>Até</b>, ou toque em <b>Usar período do painel</b>. Sem datas, exporta tudo.',
-            'Toque no relatório: <b>Vendas</b>, <b>Compras</b>, <b>Produtos</b> (stock atual) ou <b>Movimento de Stock</b>.',
+            'Toque no relatório: <b>Vendas</b>, <b>Compras</b>, <b>Produtos</b> (stock atual, tipo e se aparece no POS) ou <b>Movimento de Stock</b>.',
             'Escolha para onde enviar: WhatsApp, e-mail ou Google Drive.',
           ],
         },
@@ -482,7 +585,7 @@
       group: 'Configuração',
       icon: 'account-group-outline',
       title: 'Utilizadores e perfis',
-      lead: 'Cada funcionário deve ter a sua conta, para o Painel mostrar quanto vendeu cada um. Só os administradores criam contas.',
+      lead: 'Cada funcionário deve ter a sua conta, para o Painel mostrar quanto vendeu cada um. Só os administradores criam contas, nos planos <b>Plus</b> e <b>Premium</b>.',
       tasks: [
         {
           id: 'perfis',
@@ -495,14 +598,19 @@
                 head: ['O que pode fazer', 'Vendedor', 'Gestor', 'Admin.'],
                 center: true,
                 rows: [
-                  ['Vender, registar compras, faturas e recibos', '@yes', '@yes', '@yes'],
+                  ['Vender, emitir faturas e recibos', '@yes', '@yes', '@yes'],
+                  ['Consultar produtos e stock', '@yes', '@yes', '@yes'],
                   ['Ver vendas e compras de hoje no Painel', '@yes', '@yes', '@yes'],
+                  ['Criar e editar produtos, ajustar stock', '@no', '@yes', '@yes'],
+                  ['Registar compras', '@no', '@yes', '@yes'],
                   ['Ver lucro, despesas, gráficos e outros períodos', '@no', '@yes', '@yes'],
                   ['Exportar relatórios para Excel', '@no', '@yes', '@yes'],
                   ['Criar e gerir utilizadores', '@no', '@no', '@yes'],
+                  ['Backup e restauro', '@no', '@no', '@yes'],
                 ],
               },
             },
+            {note: 'info', text: 'No plano <b>Basic</b> só entra a <b>conta principal</b> (a criada na configuração inicial). As outras contas ficam guardadas e voltam a entrar quando o plano subir.'},
           ],
         },
         {
@@ -543,9 +651,32 @@
       n: 10,
       group: 'Configuração',
       icon: 'key-chain-variant',
-      title: 'Licença',
-      lead: 'A licença tem uma data de fim. Renove-a antes, para não interromper as vendas. Nada se perde se vencer.',
+      title: 'Licença e planos',
+      lead: 'A licença diz o seu <b>plano</b> (Basic, Plus ou Premium) e a data de fim. Renove-a antes, para não interromper as vendas. Nada se perde se vencer.',
       tasks: [
+        {
+          id: 'planos',
+          icon: 'star-circle-outline',
+          title: 'Os planos Basic, Plus e Premium',
+          summary: 'O que cada um inclui',
+          after: [
+            {
+              table: {
+                head: ['Inclui', 'Basic', 'Plus', 'Premium'],
+                center: true,
+                rows: [
+                  ['Vendas, produtos, compostos, compras, stock e Painel', '@yes', '@yes', '@yes'],
+                  ['Backup e restauro', '@yes', '@yes', '@yes'],
+                  ['Vários utilizadores e perfis', '@no', '@yes', '@yes'],
+                  ['Clientes com faturas e recibos', '@no', '@yes', '@yes'],
+                  ['Serviços', '@no', '@no', '@yes'],
+                ],
+              },
+            },
+            {p: 'Vê o seu plano em <b>Licença</b>, por exemplo: "Mercearia Central · Premium · Anual · até 30/09/2027".'},
+            {note: 'tip', text: 'Para mudar de plano, peça ao fornecedor um novo código e ative-o como numa renovação. Se o plano descer, nada é apagado: faturas, serviços e contas ficam guardados e voltam quando o plano subir.'},
+          ],
+        },
         {
           id: 'renovar',
           icon: 'autorenew',
@@ -579,18 +710,76 @@
     },
 
     {
-      id: 'problemas',
+      id: 'backup',
       n: 11,
+      group: 'Configuração',
+      icon: 'backup-restore',
+      title: 'Backup e restauro',
+      lead: 'Os dados ficam só neste telemóvel. Um <b>backup</b> é um ficheiro com tudo, para guardar fora do telemóvel ou passar para outro. Só os administradores o fazem.',
+      tasks: [
+        {
+          id: 'criar',
+          icon: 'cloud-upload-outline',
+          title: 'Criar um backup',
+          summary: 'Uma vez por semana',
+          demo: 'backup',
+          steps: [
+            'Toque no seu nome (canto superior direito) e depois em <b>Backup e restauro</b>.',
+            'Em <b>Criar backup</b>, toque no botão <b>Criar backup</b>.',
+            'Escolha onde guardar o ficheiro: Google Drive, e-mail, WhatsApp ou o computador.',
+          ],
+          after: [
+            {note: 'warning', text: 'O ficheiro inclui os dados de acesso dos utilizadores: guarde-o num local seguro e não o partilhe.'},
+            {note: 'tip', text: 'Faça um backup pelo menos uma vez por semana, e sempre antes de trocar de telemóvel ou desinstalar o YPOS.'},
+          ],
+        },
+        {
+          id: 'restaurar',
+          icon: 'cellphone-arrow-down',
+          title: 'Passar para outro telemóvel',
+          summary: 'No YPOS acabado de instalar',
+          demo: 'restaurar',
+          steps: [
+            'No telemóvel novo, ative a licença dele (<a href="#primeiros-passos/ativar">capítulo 1</a>). A licença não vai no backup.',
+            'No ecrã <b>Bem-vindo ao YPOS</b>, toque em <b>Restaurar a partir de um backup</b>.',
+            'Escolha o ficheiro <b>ypos-backup_….json</b>.',
+            'Confira o resumo (empresa, data, número de produtos, vendas…) e toque em <b>Restaurar</b>.',
+            'Entre com um utilizador do backup.',
+          ],
+        },
+        {
+          id: 'substituir',
+          icon: 'database-refresh-outline',
+          title: 'Restaurar por cima dos dados atuais',
+          summary: 'Voltar a um backup antigo',
+          demo: 'substituir',
+          steps: [
+            'Toque no seu nome e depois em <b>Backup e restauro</b>.',
+            'Em <b>Restaurar backup</b>, toque em <b>Escolher ficheiro e restaurar</b> e escolha o ficheiro.',
+            'Leia o aviso e toque em <b>Restaurar</b>.',
+            'Entre com um utilizador do backup.',
+          ],
+          after: [
+            {note: 'danger', text: 'Todos os dados deste telemóvel são substituídos pelos do backup e não há como desfazer. Se precisar dos dados atuais, crie antes um backup.'},
+            {p: 'A licença deste telemóvel mantém-se. Se o restauro falhar a meio, os dados anteriores são repostos.'},
+          ],
+        },
+      ],
+    },
+
+    {
+      id: 'problemas',
+      n: 12,
       group: 'Ajuda',
       icon: 'lifebuoy',
       title: 'Problemas frequentes',
       lead: 'Quase tudo se resolve sem ajuda técnica. Escreva a mensagem que aparece no ecrã, ou escolha um tema.',
       faq: true,
       after: [
-        {note: 'danger', text: '<b>Os dados ficam só neste telemóvel.</b> Não desinstale o YPOS nem apague os dados da aplicação: perderia vendas, produtos e faturas.'},
+        {note: 'danger', text: '<b>Os dados ficam só neste telemóvel.</b> Não desinstale o YPOS nem apague os dados da aplicação sem antes <a href="#backup/criar">criar um backup</a>.'},
         {
           list: [
-            'Exporte os relatórios para Excel uma vez por semana e guarde-os no e-mail ou no Google Drive (<a href="#painel/excel">capítulo 7</a>).',
+            'Crie um backup uma vez por semana e guarde-o no Google Drive ou no e-mail (<a href="#backup/criar">capítulo 11</a>).',
             'Não mude a data do telemóvel à mão: com a data errada, o YPOS bloqueia a licença.',
             'Não partilhe a sua senha. Tudo o que fizer fica registado no seu nome.',
           ],

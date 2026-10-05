@@ -117,7 +117,12 @@ strong {
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
+  background: var(--paper);
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
 }
+
+.badge.ok, .badge.warn, .badge.danger { border-color: transparent; }
 
 .badge.ok { background: var(--brand-soft); color: var(--brand-ink); }
 .badge.warn { background: var(--warn-soft); color: var(--warn); }

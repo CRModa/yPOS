@@ -13,12 +13,14 @@
     Number(n || 0).toLocaleString('pt-PT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' MZN';
 
   const PRODUTOS = [
-    {id: 1, n: 'Arroz 5kg', p: 450, e: 24, cat: 'Mercearia'},
-    {id: 2, n: 'Óleo 1L', p: 180, e: 15, cat: 'Mercearia'},
-    {id: 3, n: 'Açúcar 1kg', p: 95, e: 40, cat: 'Mercearia'},
-    {id: 4, n: 'Coca-Cola 2L', p: 120, e: 3, cat: 'Bebidas', low: true},
-    {id: 5, n: 'Pão', p: 10, e: 60, cat: 'Padaria'},
-    {id: 6, n: 'Sabão em barra', p: 60, e: 12, cat: 'Limpeza'},
+    {id: 1, n: 'Arroz 5kg', p: 450, c: 380, e: 24, cat: 'Mercearia'},
+    {id: 2, n: 'Óleo 1L', p: 180, c: 140, e: 15, cat: 'Mercearia'},
+    {id: 3, n: 'Açúcar 1kg', p: 95, c: 70, e: 40, cat: 'Mercearia'},
+    {id: 4, n: 'Coca-Cola 2L', p: 120, c: 90, e: 3, cat: 'Bebidas', low: true},
+    {id: 5, n: 'Pão', p: 10, c: 7, e: 60, cat: 'Padaria'},
+    {id: 6, n: 'Sabão em barra', p: 60, c: 45, e: 12, cat: 'Limpeza'},
+    // Material usado só por serviços: oculto no POS.
+    {id: 7, n: 'Papel de embrulho', p: 15, c: 8, e: 50, cat: 'Embalagem', oculto: true},
   ];
   const produto = id => PRODUTOS.find(p => p.id === Number(id));
 
@@ -110,7 +112,7 @@
     const estados = {
       none: ['', 'key-outline', 'Sem licença', 'Nenhuma licença instalada neste aparelho.'],
       warn: ['warn', 'alert-outline', 'Licença ativa', 'A licença vence em 3 dias. Renove para não parar.'],
-      ok: ['ok', 'shield-check-outline', 'Licença ativa', 'Mercearia Central · plano Anual · até 30/09/2027'],
+      ok: ['ok', 'shield-check-outline', 'Licença ativa', 'Mercearia Central · Premium · Anual · até 30/09/2027'],
     };
     const [cls, icon, titulo, msg] = estados[s.lic || 'none'];
     return (
@@ -159,7 +161,9 @@
       field(s, 'nuit', 'NUIT', 'Ex: 123456789') +
       field(s, 'tel', 'Telefone', 'Ex: 84 123 4567') +
       field(s, 'end', 'Endereço', 'Ex: Av. Julius Nyerere, Maputo') +
-      `<div class="a-btn" data-t="seguinte">Seguinte</div></div>`,
+      `<div class="a-btn" data-t="seguinte">Seguinte</div>` +
+      `<div class="a-or" style="margin-top:6px">Já usava o YPOS noutro aparelho?</div>` +
+      `<div class="a-btn outline" data-t="restaurar">${i('backup-restore')}Restaurar a partir de um backup</div></div>`,
   };
 
   screens.setup2 = {
@@ -193,7 +197,7 @@
     tab: 'venda',
     render: s => {
       const {cart, ids, total, itens} = carrinho(s);
-      const cards = PRODUTOS.map(p => {
+      const cards = PRODUTOS.filter(p => !p.oculto).map(p => {
         const q = cart[p.id] || 0;
         return (
           `<div class="a-card${q ? ' on' : ''}" data-t="p-${p.id}">` +
@@ -252,30 +256,103 @@
   screens.produtos = {
     tab: 'produtos',
     render: s => {
-      const nova = s.novo
-        ? `<div class="a-item new" data-k="novo-prod"><div class="ic">${i('package-variant-closed')}</div><div class="t"><b>Farinha 2kg</b><small>Mercearia · Estoque: 30</small></div><div class="r">${fmt(150)}</div></div>`
-        : '';
+      const nova =
+        (s.novo
+          ? `<div class="a-item new" data-k="novo-prod"><div class="ic">${i('package-variant-closed')}</div><div class="t"><b>Farinha 2kg</b><small>Mercearia · Estoque: 30</small></div><div class="r">${fmt(150)}</div></div>`
+          : '') +
+        (s.novoComp
+          ? `<div class="a-item new" data-k="novo-comp"><div class="ic">${i('package-variant-plus')}</div><div class="t"><b>Cesta básica</b><small>Mercearia · Estoque: 15</small> <span class="a-badge">Composto</span></div><div class="r">${fmt(790)}</div></div>`
+          : '') +
+        (s.novoServ
+          ? `<div class="a-item new" data-k="novo-serv"><div class="ic">${i('hand-heart-outline')}</div><div class="t"><b>Embrulho para presente</b><small>Serviços</small> <span class="a-badge">Serviço</span></div><div class="r">${fmt(50)}</div></div>`
+          : '');
       const lista = PRODUTOS.map(
         p =>
           `<div class="a-item" data-t="prod-${p.id}"><div class="ic">${i('package-variant-closed')}</div>` +
           `<div class="t"><b>${p.n}</b><small>${p.cat} · Estoque: ${p.id === 4 && s.estoque != null ? s.estoque : p.e}</small>` +
-          `${p.low ? ' <span class="a-badge warn">Estoque baixo</span>' : ''}</div><div class="r">${fmt(p.p)}</div></div>`,
+          `${p.low ? ' <span class="a-badge warn">Estoque baixo</span>' : ''}${p.oculto ? ' <span class="a-badge neutral">Oculto no POS</span>' : ''}</div><div class="r">${fmt(p.p)}</div></div>`,
       ).join('');
       return header('Produtos', s) + `<div class="a-body a-scroll">${search(s, 'Buscar produto...')}<div class="a-list">${nova}${lista}</div></div>${fab()}`;
     },
   };
 
+  /** Componentes de um composto ou materiais de um serviço (ComponentesEditor.tsx). */
+  function componentes(s, servico) {
+    // Um composto começa com uma linha; um serviço pode não ter materiais.
+    const n = s.nc != null ? s.nc : servico ? 0 : 1;
+    let html = `<div class="a-panel" data-t="comps">${label(servico ? 'MATERIAIS CONSUMIDOS (OPCIONAL)' : 'COMPONENTES (POR UNIDADE)')}`;
+    if (servico && n === 0) html += `<div class="a-sub" style="font-size:9px">Sem materiais: a venda deste serviço não mexe no stock.</div>`;
+    let stock = null;
+    let custo = 0;
+    for (let k = 0; k < n; k++) {
+      const p = PRODUTOS.find(x => x.n === s['c' + k]);
+      const q = num(s['cq' + k]);
+      if (p && q > 0) {
+        stock = Math.min(stock == null ? Infinity : stock, Math.floor(p.e / q));
+        custo += p.c * q;
+      }
+      html +=
+        `<div class="a-row"${k === n - 1 && k > 0 ? ` data-k="comp-${k}"` : ''} style="align-items:center">` +
+        `<div style="flex:2.2">${select(s, 'c' + k, servico ? 'Selecione o material...' : 'Selecione o componente...')}</div>${field(s, 'cq' + k, '', 'Qtd')}</div>`;
+    }
+    const resumo =
+      !servico || n > 0
+        ? `<div class="a-row" style="justify-content:space-between;font-size:9.5px" data-t="compres">` +
+          `<span style="flex:0 auto">${servico ? 'Materiais dão para' : 'Stock disponível'}: <b>${stock || 0}</b></span>` +
+          `<span style="flex:0 auto;text-align:right">${servico ? 'Custo materiais' : 'Custo'}: <b>${fmt(custo)}</b></span></div>`
+        : '';
+    return (
+      html +
+      `<div class="a-link" style="color:var(--app-primary);text-align:left;padding:0" data-t="addcomp">${i('plus-circle-outline')} ${
+        servico ? 'Adicionar material' : 'Adicionar componente'
+      }</div>${resumo}</div>`
+    );
+  }
+
+  const switchVenda = s =>
+    `<div class="a-switch"><div><b>Mostrar no painel de vendas</b><small>Desligue para itens usados só como componente.</small></div>` +
+    `<span class="a-toggle${s.oculto ? '' : ' on'}" data-t="visivel"></span></div>`;
+
   screens.produtoForm = {
     tab: null,
-    render: s =>
-      header('Novo Produto', s, {close: true, plain: true}) +
-      `<div class="a-body a-scroll pad">` +
-      field(s, 'pnome', 'NOME DO PRODUTO', 'Ex: Arroz 5kg') +
-      label('CATEGORIA') +
-      chips(s, 'cat', ['Mercearia', 'Bebidas', 'Limpeza', 'Padaria']) +
-      row(field(s, 'ppreco', 'PREÇO DE VENDA', '0,00'), field(s, 'pcusto', 'CUSTO DE PRODUÇÃO', '0,00')) +
-      row(field(s, 'pest', 'ESTOQUE INICIAL', '0'), field(s, 'pmin', 'ESTOQUE MÍNIMO', '0')) +
-      `<div class="a-btn" data-t="salvar">Salvar</div></div>`,
+    render: s => {
+      const tipo = s.tipo || 'Simples';
+      const servico = tipo === 'Serviço';
+      const resto =
+        tipo === 'Composto'
+          ? row(field(s, 'ppreco', 'PREÇO DE VENDA', '0,00'), field(s, 'pmin', 'ESTOQUE MÍNIMO', '0')) + componentes(s)
+          : servico
+          ? field(s, 'ppreco', 'PREÇO DE VENDA', '0,00') +
+            field(s, 'pcusto', 'CUSTO DO SERVIÇO (MÃO DE OBRA, OPCIONAL)', '0,00') +
+            componentes(s, true)
+          : row(field(s, 'ppreco', 'PREÇO DE VENDA', '0,00'), field(s, 'pcusto', 'CUSTO DE PRODUÇÃO', '0,00')) +
+            row(field(s, 'pest', 'ESTOQUE INICIAL', '0'), field(s, 'pmin', 'ESTOQUE MÍNIMO', '0'));
+      return (
+        header(servico ? 'Novo Serviço' : 'Novo Produto', s, {close: true, plain: true}) +
+        `<div class="a-body a-scroll pad">` +
+        field(s, 'pnome', servico ? 'NOME DO SERVIÇO' : 'NOME DO PRODUTO', 'Ex: Arroz 5kg') +
+        label('TIPO') +
+        chips(s, 'tipo', ['Simples', 'Composto', 'Serviço'], 'Simples') +
+        switchVenda(s) +
+        label('CATEGORIA') +
+        chips(s, 'cat', ['Mercearia', 'Bebidas', 'Limpeza', 'Serviços']) +
+        resto +
+        `<div class="a-btn" data-t="salvar">Salvar</div></div>`
+      );
+    },
+  };
+
+  screens.backupScr = {
+    tab: null,
+    render: () =>
+      header('Backup e restauro', {}, {close: true, plain: true}) +
+      `<div class="a-body a-scroll pad"><div class="a-panel"><div class="a-h">${i('cloud-upload-outline')} Criar backup</div>` +
+      `<div class="a-sub">Gera um ficheiro com todos os dados (produtos, stock, vendas, faturas, clientes, utilizadores e configurações). Guarde-o no Drive, envie por e-mail ou WhatsApp, ou copie para o computador.</div>` +
+      `<div class="a-sub" style="color:var(--app-warning)">O ficheiro inclui os dados de acesso dos utilizadores: guarde-o num local seguro.</div>` +
+      `<div class="a-btn" data-t="criarbk">Criar backup</div></div>` +
+      `<div class="a-panel"><div class="a-h">${i('backup-restore')} Restaurar backup</div>` +
+      `<div class="a-sub">Substitui todos os dados deste aparelho pelos de um ficheiro de backup do YPOS. A licença deste aparelho não é alterada.</div>` +
+      `<div class="a-btn outline" data-t="restaurarbk">Escolher ficheiro e restaurar</div></div></div>`,
   };
 
   screens.produtoDet = {
@@ -493,6 +570,22 @@
       );
     },
 
+    shareFile: () =>
+      `<div class="a-grab"></div><div class="a-h">Partilhar</div>` +
+      `<div class="a-panel" style="flex-direction:row;align-items:center;font-size:9.5px">${i('code-json')}<b>ypos-backup_2026-10-05_1842.json</b></div>` +
+      `<div class="a-share">` +
+      `<div data-t="drive"><i style="background:#1a73e8">${i('google-drive')}</i>Drive</div>` +
+      `<div><i style="background:#25d366">${i('whatsapp')}</i>WhatsApp</div>` +
+      `<div><i style="background:#ea4335">${i('email-outline')}</i>E-mail</div>` +
+      `<div><i style="background:#6b7280">${i('folder-download-outline')}</i>Guardar</div></div>`,
+
+    picker: () =>
+      `<div class="a-grab"></div><div class="a-h">Escolher ficheiro</div><span class="a-label">TRANSFERÊNCIAS</span>` +
+      `<div class="a-list">` +
+      `<div class="a-item" data-t="file1"><div class="ic">${i('code-json')}</div><div class="t"><b>ypos-backup_2026-10-04_1830.json</b><small>Ontem · 2,4 MB</small></div></div>` +
+      `<div class="a-item"><div class="ic">${i('code-json')}</div><div class="t"><b>ypos-backup_2026-09-27_1912.json</b><small>27/09 · 2,1 MB</small></div></div>` +
+      `<div class="a-item"><div class="ic">${i('file-pdf-box')}</div><div class="t"><b>FT_2026_0041.pdf</b><small>29/09 · 84 KB</small></div></div></div>`,
+
     resumo: () =>
       `<div class="a-h" style="font-size:14px">A imprimir…</div><div class="a-sub">Resumo do dia enviado para MPT-II.</div>` +
       recibo('RESUMO DO DIA', ['Vendas: 18', 'Total: 12.450,00', 'Operador: Ana M.']),
@@ -519,6 +612,7 @@
         r('account-multiple-outline', 'Clientes', 'm-clientes') +
         r('truck-outline', 'Fornecedores', 'm-fornecedores') +
         r('account-cog-outline', 'Utilizadores', 'm-usuarios') +
+        r('backup-restore', 'Backup e restauro', 'm-backup') +
         r('key-outline', 'Licença', 'm-licenca') +
         r('logout', 'Sair', 'm-sair', 'danger') +
         `</div>`;
